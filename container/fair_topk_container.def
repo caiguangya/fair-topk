@@ -1,0 +1,50 @@
+Bootstrap: docker
+From: ubuntu:24.04
+
+%post
+    export DEBIAN_FRONTEND=noninteractive
+    apt-get -y update
+    apt-get -y upgrade
+    apt-get install -y build-essential
+    apt-get install -y g++ clang cmake
+    apt-get install -y vim tar wget unzip
+    apt-get install -y git
+    apt-get install -y libboost-dev xtensor-dev libgmp-dev libmpfr-dev
+    unset DEBIAN_FRONTEND
+
+    wget -v https://packages.gurobi.com/11.0/gurobi11.0.3_linux64.tar.gz
+    git clone --single-branch -b 3.4.0 https://gitlab.com/libeigen/eigen.git eigen
+    git clone https://github.com/khizmax/libcds.git libcds
+
+    tar -xvf gurobi11.0.3_linux64.tar.gz
+    rm -f gurobi11.0.3_linux64.tar.gz
+    cd gurobi1103/linux64/src/build
+    sed -i 's/-O/-O3 -DNDEBUG/g' Makefile
+    make
+    rm -f *.o
+    cd ../../../../
+    mkdir /usr/local/lib/gurobi
+    mkdir /usr/local/include/gurobi
+    cp -f gurobi1103/linux64/lib/libgurobi.so.11.0.3 /usr/local/lib/gurobi/libgurobi110.so
+    cp -f gurobi1103/linux64/src/build/libgurobi_c++.a /usr/local/lib/gurobi
+    mv -f gurobi1103/linux64/include/*.h /usr/local/include/gurobi
+    mv -f gurobi1103 /opt/gurobi
+
+    cd eigen
+    mkdir build
+    cd build
+    cmake -DCMAKE_BUILD_TYPE=Release ..
+    make install
+    cd ../../
+    rm -rf eigen
+
+    cd libcds
+    git reset --hard 9985d2a87feaa3e92532e28f4ab762a82855a49c
+    cmake -DCMAKE_BUILD_TYPE=Release .
+    make install
+    cd ../
+    rm -rf libcds
+
+%environment
+    export LC_ALL=C
+    export LD_LIBRARY_PATH=/usr/local/lib64
