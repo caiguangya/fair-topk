@@ -1,13 +1,211 @@
 #include "data_loader.h"
 #include <string>
 #include <fstream>
+#include <unordered_map>
+#include <ctime>
 
+#include <boost/tokenizer.hpp>
 #include <xtensor/xcsv.hpp>
 #include <xtensor/xview.hpp>
 
 namespace FairTopK {
 
 namespace DataLoader {
+
+void readCompasData(const std::string& file, std::vector<Eigen::VectorXd>& points, 
+    std::vector<int>& genders, std::vector<int>& races) {
+
+    std::ifstream inf(file, std::ifstream::in);
+    std::string line;
+    std::getline(inf, line);
+    
+    boost::char_separator<char> sep(",", "", boost::keep_empty_tokens);
+    boost::tokenizer<boost::char_separator<char> > tok(line, sep);
+
+    constexpr int dimension = 6;
+
+    constexpr int genderIdx = 5;
+    constexpr int raceIdx = 9;
+
+    constexpr int juryOtherCourtIdx = 13;
+    constexpr int priorsCountIdx = 14;
+    constexpr int daysFromCompasIdx = 21;
+    constexpr int startIdx = 49;
+    constexpr int endIdx = 50;
+
+    constexpr int jailInIdx = 16;
+    constexpr int jailOutIdx = 17;
+
+    constexpr int coordIndices[dimension - 1] = 
+        { juryOtherCourtIdx, priorsCountIdx, daysFromCompasIdx, startIdx, endIdx };
+
+    std::unordered_map<int, int> pointCoordIdxLookupTable;
+    for (int i = 0; i < dimension - 1; i++) {
+        pointCoordIdxLookupTable.emplace(coordIndices[i], i);
+    }
+
+    while (std::getline(inf, line)) {
+        tok = boost::tokenizer<boost::char_separator<char> >(line, sep);
+        
+        bool hasMissingValue = false;
+
+        int gender = -1;
+        int race = -1;
+        Eigen::VectorXd point = Eigen::VectorXd::Zero(dimension);
+
+        std::time_t jailInDate = 0;
+        std::time_t jailOutDate = 0;
+
+        int idx = 0;
+        for (auto token : tok) {
+            if (idx == genderIdx) {
+                if (token.empty()) {
+                    hasMissingValue = true;
+                    break;
+                }
+
+                if (token == "Female") {
+                    gender = 0;
+                }
+                else {
+                    gender = 1;
+                }
+            }
+            else if (idx == raceIdx) {
+                if (token.empty()) {
+                    hasMissingValue = true;
+                    break;
+                }
+
+                if (token == "African-American") {
+                    race = 0;
+                }
+                else if (token == "Caucasian") {
+                    race = 1;
+                }
+                else {
+                    race = 2;
+                }
+            }
+            else if (std::find(coordIndices, coordIndices + dimension - 1, idx) != coordIndices + dimension - 1) {              
+                if (token.empty()) {
+                    hasMissingValue = true;
+                    break;
+                }
+
+                point(pointCoordIdxLookupTable[idx]) = stoi(token);
+            }
+            else if (idx == jailInIdx) {
+                if (token.empty()) {
+                    hasMissingValue = true;
+                    break;
+                }
+
+                std::tm t = {};
+                std::istringstream ss(token);
+                ss >> std::get_time(&t, "%Y-%m-%d %H:%M:%S");
+
+                if (ss.fail()) {
+                    hasMissingValue = true;
+                    break;
+                }
+                t.tm_hour = 0;
+                t.tm_min = 0;
+                t.tm_sec = 0;
+                jailInDate = std::mktime(&t);
+            }
+            else if (idx == jailOutIdx) {
+                 if (token.empty()) {
+                    hasMissingValue = true;
+                    break;
+                }
+
+                std::tm t = {};
+                std::istringstream ss(token);
+                ss >> std::get_time(&t, "%Y-%m-%d %H:%M:%S");
+
+                if (ss.fail()) {
+                    hasMissingValue = true;
+                    break;
+                }
+                t.tm_hour = 0;
+                t.tm_min = 0;
+                t.tm_sec = 0;
+                jailOutDate = std::mktime(&t);
+            }
+
+            idx += 1;
+        }
+
+        if (!hasMissingValue) {
+            point(dimension - 1) = (std::difftime(jailOutDate, jailInDate) / (60 * 60 * 24)) + 1;
+            points.push_back(std::move(point));
+            genders.push_back(gender);
+            races.push_back(race);
+        }
+    }
+}
+
+void readJEEData(const std::string& file, std::vector<Eigen::VectorXd>& points, std::vector<int>& genders) {
+    std::ifstream inf(file, std::ifstream::in);
+    std::string line;
+    std::getline(inf, line);
+    
+    boost::char_separator<char> sep(",", "", boost::keep_empty_tokens);boost::tokenizer<boost::char_separator<char> > tok(line, sep);
+
+    constexpr int dimension = 3;
+
+    constexpr int genderIdx = 4;
+    constexpr int mathIdx = 7;
+    constexpr int physIdx = 8;
+    constexpr int chemIdx = 9;
+
+    constexpr int scoreIndices[dimension] = { mathIdx, physIdx, chemIdx };
+
+    std::unordered_map<int, int> pointCoordIdxLookupTable;
+    for (int i = 0; i < dimension; i++) {
+        pointCoordIdxLookupTable.emplace(scoreIndices[i], i);
+    }
+
+    int lineCount = 0;
+    while (std::getline(inf, line)) {
+        tok = boost::tokenizer<boost::char_separator<char> >(line, sep);
+        lineCount += 1;
+
+        int gender = -1;
+        Eigen::VectorXd point = Eigen::VectorXd::Zero(dimension);
+
+        bool hasMissingValue = false;
+
+        int idx = 0;
+        for (auto token : tok) {
+            if (idx == genderIdx) {
+                if (token.empty()) {
+                    hasMissingValue = true;
+                    break;
+                }
+
+                gender = (token == "M" ? 0 : 1);
+            }
+
+            else if (std::find(scoreIndices, scoreIndices + dimension, idx) !=
+                     scoreIndices + dimension) {
+                if (token.empty()) {
+                    hasMissingValue = true;
+                    break;
+                }
+                point(pointCoordIdxLookupTable[idx]) = stoi(token);
+            }
+
+            idx += 1;
+        }
+
+        if (!hasMissingValue) {
+            points.push_back(std::move(point));
+            genders.push_back(gender);
+        }
+    }
+}
 
 namespace {
 void readPreprocessedCompasData(const std::string& file, std::vector<Eigen::VectorXd>& points,  
