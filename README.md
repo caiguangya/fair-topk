@@ -1,7 +1,7 @@
 # Finding a Fair Scoring Function for Top-k Selection: Hardness, Algorithms and Experiments
 
 ## Overview
-This repository host codes for *Finding a Fair Scoring Function for Top-k Selection: Hardness, Algorithms and Experiments* (in submission).
+This repository hosts codes for *Finding a Fair Scoring Function for Top-k Selection: Hardness, Algorithms and Experiments* (in submission, [full version](https://arxiv.org/abs/2503.11575) available).
 
 The `main` branch is all you need for reproducing experimental results and the `preprocessing` branch contains codes for data preprocessing.
 
@@ -37,7 +37,7 @@ Output programs: **klevel_based_method**, **klevel_based_method_2d**, **mip_base
 
     e.g., ``` klevel_based_method compas-50.csv 50 0.4 0.6 0.05 20 64 ``` is the default experimental setting for the k-level-based method on the 6-D COMPAS dataset.
 
-For executing mip_based_method inside the container, you might need to apply a new [Gurobi license](https://www.gurobi.com/features/web-license-service/). Before executing mip_based_method, run the following command
+For executing mip_based_method inside the container, you might need to apply a new [Gurobi license](https://www.gurobi.com/features/web-license-service/). Before executing mip_based_method, run the following command:
 ```
 export GRB_LICENSE_FILE=\path\to\gurobi\license
 ```
