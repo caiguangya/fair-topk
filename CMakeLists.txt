@@ -25,9 +25,13 @@ target_link_libraries(data_loader_obj Boost::boost Eigen3::Eigen xtensor)
 
 add_library(utility_obj OBJECT src/utility.cpp)
 target_include_directories(utility_obj PRIVATE include)
-target_link_libraries(utility_obj Eigen3::Eigen)
+target_link_libraries(utility_obj Eigen3::Eigen CLI11::CLI11)
 
-set(COMMON_OBJS $<TARGET_OBJECTS:data_loader_obj> $<TARGET_OBJECTS:utility_obj>)
+add_library(expt_obj OBJECT src/experiments.cpp)
+target_include_directories(expt_obj PRIVATE include)
+target_link_libraries(expt_obj utility_obj Eigen3::Eigen)
+
+set(COMMON_OBJS $<TARGET_OBJECTS:data_loader_obj> $<TARGET_OBJECTS:utility_obj> $<TARGET_OBJECTS:expt_obj>)
 
 add_executable(mip_based_method src/mip_based_method.cpp ${COMMON_OBJS})
 add_executable(klevel_based_method src/klevel_based_method.cpp ${COMMON_OBJS})
