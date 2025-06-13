@@ -6,6 +6,8 @@ This repository host codes for *Finding a Fair Scoring Function for Top-k Select
 The `main` branch is all you need for reproducing experimental results and the `preprocessing` branch contains codes for data preprocessing.
 
 ## Build
+This project can be built using either Apptainer or Docker containerization. 
+
 ### Apptainer
 1. [Install Apptainer](https://apptainer.org/docs/admin/main/installation.html) (see [this](https://github.com/apptainer/apptainer/blob/main/INSTALL.md#apparmor-profile-ubuntu-2310) for installation on Ubuntu 23.10+)
 2. Build Apptainer image
@@ -42,7 +44,9 @@ Output programs: **klevel_based_method**, **klevel_based_method_2d**, **mip_base
 2. Launch the container
 3. Run programs inside the container
     ```
-    program [-t] [-q] [-f <PREPROCESSED DATASET PATH>] [-k k_value] [-plb lower_bound] [-pub upper_bound] [-eps epsilon] [-ns num_samples [-us]] [-nt num_threads] [-uo]
+    program [-t] [-q] [-f <PREPROCESSED DATASET PATH>] [-k k_value] \
+        [-plb lower_bound] [-pub upper_bound] [-eps epsilon] \ 
+        [-ns num_samples [-us]] [-nt num_threads] [-uo]
     ```
     * program: klevel_based_method, klevel_based_method_2d, mip_based_method, baseline or baseline_2d
     * -t: Runtime experiment
