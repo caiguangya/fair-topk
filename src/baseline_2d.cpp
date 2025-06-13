@@ -8,6 +8,7 @@
 
 #include "utility.h"
 #include "data_loader.h"
+#include "experiments.h"
 #include "memory.h"
 
 struct GroupedLine {
@@ -332,29 +333,9 @@ int main(int argc, char* argv[]) {
     std::vector<int> groups;
     int protectedGroup = -1;
 
-    FairTopK::DataLoader::readPreprocessedDataset(argv[1], points, groups, protectedGroup);
+    auto [fileName, params] = FairTopK::parseCommandLine(argc, argv);
 
-    int k = 0;
-    double pGroupLowerBound = 0;
-    double pGroupUpperBound = 0;
-    double margin = 0.0;
-    int sampleCount = 0;
-
-    try {
-        k = std::stoi(std::string(argv[2]));
-        pGroupLowerBound = std::stod(std::string(argv[3]));
-        pGroupUpperBound = std::stod(std::string(argv[4]));
-        margin = std::stod(std::string(argv[5]));
-        sampleCount = std::stoi(std::string(argv[6]));
-    } catch (const std::exception& e) {
-        std::cerr << "Invalid input parameters" << std::endl;
-        return -1;
-    }
-
-    FairTopK::printInputInfos(k, pGroupLowerBound, pGroupUpperBound, margin);
-
-    int lowerBoundInt = (int)std::floor(pGroupLowerBound * k);
-    int upperBoundInt = (int)std::ceil(pGroupUpperBound * k);
+    FairTopK::DataLoader::readPreprocessedDataset(fileName, points, groups, protectedGroup);
 
     int dimension = points[0].rows();
     if (dimension != 2) {
@@ -362,11 +343,7 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
-    auto samples = FairTopK::getRandomWeightVectors(sampleCount, points, groups, 
-        k, protectedGroup, lowerBoundInt, upperBoundInt);
-
-    FairTopK::fairTopkMarginTimeProfiling(samples, points, groups, k, protectedGroup, 
-        lowerBoundInt, upperBoundInt, margin, solve);
+    FairTopK::fairTopkExperiments(points, groups, protectedGroup, params, solve);
 
     return 0;
 }

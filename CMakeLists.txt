@@ -17,10 +17,11 @@ find_package(GUROBI REQUIRED)
 find_package(xtensor REQUIRED)
 find_package(Eigen3 3.4 REQUIRED NO_MODULE)
 find_package(LibCDS REQUIRED)
+find_package(CLI11 CONFIG REQUIRED)
 
-add_library(common_objs OBJECT src/data_loader.cpp src/utility.cpp)
+add_library(common_objs OBJECT src/data_loader.cpp src/utility.cpp src/experiments.cpp)
 target_include_directories(common_objs PRIVATE include)
-target_link_libraries(common_objs Eigen3::Eigen xtensor)
+target_link_libraries(common_objs Eigen3::Eigen xtensor Boost::boost CLI11::CLI11)
 
 add_executable(mip_based_method src/mip_based_method.cpp $<TARGET_OBJECTS:common_objs>)
 add_executable(klevel_based_method src/klevel_based_method.cpp $<TARGET_OBJECTS:common_objs>)
