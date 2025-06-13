@@ -15,6 +15,7 @@ From: ubuntu:24.04
     wget -v https://packages.gurobi.com/11.0/gurobi11.0.3_linux64.tar.gz
     git clone --single-branch -b 3.4.0 https://gitlab.com/libeigen/eigen.git eigen
     git clone https://github.com/khizmax/libcds.git libcds
+    git clone --single-branch -b v2.5.0 https://github.com/CLIUtils/CLI11.git CLI11
 
     tar -xvf gurobi11.0.3_linux64.tar.gz
     rm -f gurobi11.0.3_linux64.tar.gz
@@ -44,6 +45,12 @@ From: ubuntu:24.04
     make install
     cd ../
     rm -rf libcds
+
+    cd CLI11
+    cmake -DCMAKE_BUILD_TYPE=Release .
+    make install -j
+    cd ../
+    rm -rf CLI11
 
 %environment
     export LC_ALL=C

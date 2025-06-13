@@ -18,6 +18,7 @@
 #include "data_loader.h"
 #include "memory.h"
 #include "utility.h"
+#include "experiments.h"
 
 struct KSetComparator {
     int operator ()(const int *left, const int *right) const {
@@ -459,31 +460,9 @@ int main(int argc, char* argv[]) {
     std::vector<int> groups;
     int protectedGroup = -1;
 
-    FairTopK::DataLoader::readPreprocessedDataset(argv[1], points, groups, protectedGroup);
+    auto [fileName, params] = FairTopK::parseCommandLine(argc, argv);
 
-    int k = 0;
-    double pGroupLowerBound = 0;
-    double pGroupUpperBound = 0;
-    double margin = 0.0;
-    int sampleCount = 0;
-    int threadCount = 1;
-
-    try {
-        k = std::stoi(std::string(argv[2]));
-        pGroupLowerBound = std::stod(std::string(argv[3]));
-        pGroupUpperBound = std::stod(std::string(argv[4]));
-        margin = std::stod(std::string(argv[5]));
-        sampleCount = std::stoi(std::string(argv[6]));
-        threadCount = std::stoi(std::string(argv[7]));
-    } catch (const std::exception& e) {
-        std::cerr << "Invalid input parameters" << std::endl;
-        return -1;
-    }
-
-    FairTopK::printInputInfos(k, pGroupLowerBound, pGroupUpperBound, margin, threadCount);
-
-    int lowerBoundInt = (int)std::floor(pGroupLowerBound * k);
-    int upperBoundInt = (int)std::ceil(pGroupUpperBound * k);
+    FairTopK::DataLoader::readPreprocessedDataset(fileName, points, groups, protectedGroup);
 
     int dimension = points[0].rows();
     constexpr int minDimension = 3;
@@ -493,7 +472,7 @@ int main(int argc, char* argv[]) {
         std::cerr << "Only support datasets with 3 <= dimensions <= 6" << std::endl;
         return -1;
     }
-    if (threadCount <= 0) {
+    if (params.threadCount <= 0) {
         std::cerr << "The number of threads must be greater than or equal to 1" << std::endl;
         return -1;
     }
@@ -501,16 +480,12 @@ int main(int argc, char* argv[]) {
     constexpr int dimCount = maxDimension - minDimension + 1;
     int dimDiff = dimension - minDimension;
 
-    auto samples = FairTopK::getRandomWeightVectors(sampleCount, points, groups, k, protectedGroup, 
-        lowerBoundInt, upperBoundInt);
-
-    if (threadCount > 1) {
+    if (params.threadCount > 1) {
         auto solveFunc = boost::mp11::mp_with_index<dimCount>(dimDiff,
             [](auto dimDiff) { return parallelSolve<dimDiff() + minDimension>; });
 
-        FairTopK::fairTopkMarginTimeProfiling(samples, points, groups, k, protectedGroup, 
-            lowerBoundInt, upperBoundInt, margin, 
-            [threadCount, solveFunc]<class... Args>(Args&&... params) { 
+        FairTopK::fairTopkExperiments(points, groups, protectedGroup, params, 
+            [threadCount = params.threadCount, solveFunc]<class... Args>(Args&&... params) { 
                 return solveFunc(threadCount, std::forward<Args>(params)...);
         });
     }
@@ -518,8 +493,7 @@ int main(int argc, char* argv[]) {
         auto solveFunc = boost::mp11::mp_with_index<dimCount>(dimDiff,
             [](auto dimDiff) { return sequentialSolve<dimDiff() + minDimension>; });
 
-        FairTopK::fairTopkMarginTimeProfiling(samples, points, groups, k, protectedGroup, 
-            lowerBoundInt, upperBoundInt, margin, solveFunc);
+        FairTopK::fairTopkExperiments(points, groups, protectedGroup, params, solveFunc);
     }
 
     return 0;

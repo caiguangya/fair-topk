@@ -91,7 +91,7 @@ public:
 		std::size_t bytes = ((size * sizeof(T) + complement) & (~complement));
 		if (curBlockPos + bytes > blockSize) {
 			usedBlocks.push_back(curBlock);
-			curBlock = allocAligned<std::int8_t, BlockAlign>(std::max(size, blockSize));
+			curBlock = allocAligned<std::int8_t, BlockAlign>(std::max(bytes, blockSize));
 			curBlockPos = 0;
 		}
 		T *ret = (T *)(curBlock + curBlockPos);

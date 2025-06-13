@@ -1,7 +1,8 @@
 #include "utility.h"
-#include <random>
 #include <limits>
 #include <iostream>
+
+#include "CLI/CLI.hpp"
 
 namespace FairTopK {
 
@@ -109,6 +110,8 @@ const std::vector<int>& groups, int k, int pGroup, int pGroupLowerBound, int pGr
     return vectors;
 }
 
+namespace {
+
 void printInputInfos(int k, double pGroupLowerBound, double pGroupUpperBound, double margin, int threadCount) {
     std::cout << "k: " << k << 
                  " | Protected Group Proportion Lower Bound: " << pGroupLowerBound <<
@@ -119,6 +122,41 @@ void printInputInfos(int k, double pGroupLowerBound, double pGroupUpperBound, do
         std::cout << " | Number of Threads: " << threadCount;
         
     std::cout << std::endl;
+}
+
+}
+
+std::pair<std::string, InputParams> parseCommandLine(int argc, char* argv[]) {
+    CLI::App app;
+    std::string file;
+    InputParams inputParams;
+
+    double pGroupLowerBoundRatio = 0.0;
+    double pGroupUpperBoundRatio = 0.0;
+
+    app.allow_non_standard_option_names();
+
+    app.add_option("-f", file, "File");
+    app.add_option("-k", inputParams.k, "k");
+    app.add_option("-eps", inputParams.margin, "Epsilon");
+    app.add_option("-plb", pGroupLowerBoundRatio, "Protected Group lower bound");
+    app.add_option("-pub", pGroupUpperBoundRatio, "Protected Group upper bound");
+    app.add_option("-nt", inputParams.threadCount, "Number of threads");
+    app.add_option("-ns", inputParams.sampleCount, "Number of samples");
+
+    app.add_flag("-t", inputParams.runtime, "Runtime");
+    app.add_flag("-q", inputParams.quality, "Evaluate Quality");
+    app.add_flag("-us", inputParams.uniformSampling, "Uniform sampling method");
+    app.add_flag("-uo", inputParams.unoptimized, "Unoptimized");
+
+    app.parse(argc, argv);
+
+    inputParams.pGroupLowerBound = (int)std::floor(pGroupLowerBoundRatio * inputParams.k);
+    inputParams.pGroupUpperBound = (int)std::ceil(pGroupUpperBoundRatio * inputParams.k);
+
+    printInputInfos(inputParams.k, pGroupLowerBoundRatio, pGroupUpperBoundRatio, inputParams.margin, inputParams.threadCount);
+
+    return { std::move(file), std::move(inputParams) };
 }
 
 }

@@ -17,6 +17,7 @@ find_package(GUROBI REQUIRED)
 find_package(xtensor REQUIRED)
 find_package(Eigen3 3.4 REQUIRED NO_MODULE)
 find_package(LibCDS REQUIRED)
+find_package(CLI11 CONFIG REQUIRED)
 
 add_library(data_loader_obj OBJECT src/data_loader.cpp)
 target_include_directories(data_loader_obj PRIVATE include)

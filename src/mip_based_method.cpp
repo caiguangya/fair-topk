@@ -7,6 +7,19 @@
 
 #include "utility.h"
 #include "data_loader.h"
+#include "experiments.h"
+
+bool checkLicense() {
+    try {
+        GRBEnv env = GRBEnv(true);
+        env.set("OutputFlag", "0");
+        env.start();
+        return true;
+    } catch (const GRBException& e) {
+        std::cerr << e.getMessage() << std::endl;
+        return false;
+    }
+}
 
 bool solve(int threadCount, const std::vector<Eigen::VectorXd> &points,
 const std::vector<int>& groups, int k, int pGroup, int pGroupLowerBound, 
@@ -19,6 +32,7 @@ int pGroupUpperBound, double margin, Eigen::VectorXd& weights) {
     GRBModel model = GRBModel(env);
     model.set("MIPFocus", "1");
     model.set("SolutionLimit", "1");
+    model.set("IntFeasTol", "1e-6");
 
     int count = points.size();
     int dimension = points[0].rows();
@@ -98,47 +112,23 @@ int pGroupUpperBound, double margin, Eigen::VectorXd& weights) {
 }
 
 int main(int argc, char* argv[]) {
+    if (!checkLicense()) return -1;
+
     std::vector<Eigen::VectorXd> points;
     std::vector<int> groups;
     int protectedGroup = -1;
 
-    FairTopK::DataLoader::readPreprocessedDataset(argv[1], points, groups, protectedGroup);
+    auto [fileName, params] = FairTopK::parseCommandLine(argc, argv);
 
-    int k = 0;
-    double pGroupLowerBound = 0;
-    double pGroupUpperBound = 0;
-    double margin = 0.0;
-    int sampleCount = 0;
-    int threadCount = 0;
+    FairTopK::DataLoader::readPreprocessedDataset(fileName, points, groups, protectedGroup);
 
-    try {
-        k = std::stoi(std::string(argv[2]));
-        pGroupLowerBound = std::stod(std::string(argv[3]));
-        pGroupUpperBound = std::stod(std::string(argv[4]));
-        margin = std::stod(std::string(argv[5]));
-        sampleCount = std::stoi(std::string(argv[6]));
-        threadCount = std::stoi(std::string(argv[7]));
-    } catch (const std::exception& e) {
-        std::cerr << "Invalid input parameters" << std::endl;
-        return -1;
-    }
-
-    FairTopK::printInputInfos(k, pGroupLowerBound, pGroupUpperBound, margin, threadCount);
-
-    if (threadCount <= 0) {
+    if (params.threadCount <= 0) {
         std::cerr << "The number of threads must be greater than or equal to 1" << std::endl;
         return -1;
     }
 
-    int lowerBoundInt = (int)std::floor(pGroupLowerBound * k);
-    int upperBoundInt = (int)std::ceil(pGroupUpperBound * k);
-
-    auto samples = FairTopK::getRandomWeightVectors(sampleCount, points, groups, k, protectedGroup, 
-        lowerBoundInt, upperBoundInt);
-
-    FairTopK::fairTopkMarginTimeProfiling(samples, points, groups, k, protectedGroup, 
-        lowerBoundInt, upperBoundInt, margin, 
-        [threadCount]<class... Args>(Args&&... params) { 
+    FairTopK::fairTopkExperiments(points, groups, protectedGroup, params, 
+        [threadCount = params.threadCount]<class... Args>(Args&&... params) { 
             return solve(threadCount, std::forward<Args>(params)...);
     });
 
