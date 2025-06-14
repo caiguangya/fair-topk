@@ -3,6 +3,14 @@
 // Licensed under the MIT License. See LICENSE file in the project root for full license information.
 //
 
+ /*
+  * Add `pop()` with `BeforeSuccessFunc` callback to support preventing premature thread termination.
+  *
+  * This Source Code Form is subject to the terms of the Mozilla Public
+  * License, v. 2.0. If a copy of the MPL was not distributed with this
+  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+  */
+
 #ifndef XENIUM_KIRSCH_KFIFO_QUEUE_HPP
 #define XENIUM_KIRSCH_KFIFO_QUEUE_HPP
 

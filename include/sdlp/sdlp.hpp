@@ -23,6 +23,14 @@
  *      doi:10.1007/BF02574699
  */
 
+ /*
+  * Fix RNG thread contention causing performance bottleneck.
+  *
+  * This Source Code Form is subject to the terms of the Mozilla Public
+  * License, v. 2.0. If a copy of the MPL was not distributed with this
+  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+  */
+
 #ifndef SDLP_HPP
 #define SDLP_HPP
 
