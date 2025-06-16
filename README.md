@@ -46,7 +46,7 @@ Output programs: **klevel_based_method**, **klevel_based_method_2d**, **mip_base
     ```
     program [-t] [-q] [-f <PREPROCESSED DATASET PATH>] [-k k_value] \
         [-plb lower_bound] [-pub upper_bound] [-eps epsilon] \ 
-        [-ns num_samples [-us]] [-nt num_threads] [-uo]
+        [-ns num_samples [-us]] [-nt num_threads] [-uo] [-sol milp_solver]
     ```
     * program: klevel_based_method, klevel_based_method_2d, mip_based_method, baseline or baseline_2d
     * -t: Runtime experiment
@@ -55,12 +55,13 @@ Output programs: **klevel_based_method**, **klevel_based_method_2d**, **mip_base
     * -pub: Proportional upper bound of the protected group
     * -ns: Number of weight vectors
     * -us: Uniform weight vector sampling method
-    * -nt: Number of threads (needed for klevel_based_method and mip_based_method)
+    * -nt: Number of threads (needed for klevel_based_method and optional for mip_based_method with Gurobi solver)
     * -uo: Unoptimized (only works for klevel_based_method_2d)
+    * -sol: gurobi or scip (default: gurobi)
 
     See below for examples of commands and their outputs.
 
-For executing mip_based_method inside the container, you might need to apply a new [Gurobi license](https://www.gurobi.com/features/web-license-service/). Before executing mip_based_method, run the following command
+For executing mip_based_method with Gurobi solver inside the container, you might need to apply a new [Gurobi license](https://www.gurobi.com/features/web-license-service/). Before executing mip_based_method, run the following command
 ```
 export GRB_LICENSE_FILE=\path\to\gurobi\license
 ```
