@@ -14,7 +14,7 @@ Same as the `main` branch.
 
     e.g., ```preprocess_data compas-scores-two-years.csv 50 1.0 compas-50.csv``` produces the compas-50.csv of the preprocessed datasets.
 
-Again, you might need to apply a new [Gurobi license](https://www.gurobi.com/features/web-license-service/) for preprocessing the 6-D COMPAS datasets.
+You might need to apply a new [Gurobi license](https://www.gurobi.com/features/web-license-service/) for preprocessing the 6-D COMPAS dataset (SCIP solver is not supported).
 
 ## Note
 Since the preprocessing time is not the focus of this work, preprocessing algorithms and their implemenations have not been optimized for speed.

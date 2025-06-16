@@ -26,7 +26,7 @@ target_link_libraries(data_loader_obj Boost::boost Eigen3::Eigen xtensor)
 
 add_library(utility_obj OBJECT src/utility.cpp)
 target_include_directories(utility_obj PRIVATE include)
-target_link_libraries(utility_obj Eigen3::Eigen CLI11::CLI11)
+target_link_libraries(utility_obj Eigen3::Eigen CLI11::CLI11 Boost::boost)
 
 add_library(expt_obj OBJECT src/experiments.cpp)
 target_include_directories(expt_obj PRIVATE include)
