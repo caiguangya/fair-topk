@@ -20,7 +20,7 @@ void readCompasData(const std::string& file, std::vector<Eigen::VectorXd>& point
 
 void readJEEData(const std::string& file, std::vector<Eigen::VectorXd>& points, std::vector<int>& genders);
 
-void readPreprocessedDataset(const std::string& file, std::vector<Eigen::VectorXd>& points, std::vector<int>& groups, 
+bool readPreprocessedDataset(const std::string& file, std::vector<Eigen::VectorXd>& points, std::vector<int>& groups, 
     int& protectedGroup);
 
 }

@@ -9,6 +9,7 @@
 #include <fstream>
 #include <unordered_map>
 #include <ctime>
+#include <filesystem>
 
 #include <boost/tokenizer.hpp>
 #include <xtensor/xcsv.hpp>
@@ -219,8 +220,14 @@ void readPreprocessedCompasData(const std::string& file, std::vector<Eigen::Vect
 void readPreprocessedJEEData(const std::string& file, std::vector<Eigen::VectorXd>& points,std::vector<int>& genders);
 }
 
-void readPreprocessedDataset(const std::string& file, std::vector<Eigen::VectorXd>& points, std::vector<int>& groups, 
+bool readPreprocessedDataset(const std::string& file, std::vector<Eigen::VectorXd>& points, std::vector<int>& groups, 
     int& protectedGroup) {
+    if (!std::filesystem::exists(file)) {
+        std::cerr << "Fail to find the dataset file \'" << file 
+                  << "\'. Verify the path and filename are correct." << std::endl;
+        return false;
+    }
+
     if (file.find("compas") != std::string::npos) {
         std::vector<int> dummy;
         readPreprocessedCompasData(file, points, dummy, groups);
@@ -230,6 +237,12 @@ void readPreprocessedDataset(const std::string& file, std::vector<Eigen::VectorX
         readPreprocessedJEEData(file, points, groups);
         protectedGroup = 1;
     }
+    else {
+        std::cerr << "Unsupported dataset: \'" <<  file << "\'." << std::endl;
+        return false;
+    }
+
+    return true;
 }
 
 namespace {
