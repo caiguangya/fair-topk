@@ -132,7 +132,8 @@ bool solveSCIP([[maybe_unused]] int threadCount, const std::vector<Eigen::Vector
 
     SCIP_CALL(SCIPcreateProbBasic(scip, ""));
 
-    SCIP_CALL(SCIPsetLongintParam(scip, "constraints/countsols/sollimit", 1));
+    SCIP_CALL(SCIPsetIntParam(scip, "limits/solutions", 1));
+    SCIP_CALL(SCIPsetIntParam(scip, "limits/maxsol", 1));
     SCIP_CALL(SCIPsetRealParam(scip, "numerics/feastol", 1e-6));
 
     int count = points.size();
