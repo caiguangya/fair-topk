@@ -55,7 +55,7 @@ Output programs: **klevel_based_method**, **klevel_based_method_2d**, **mip_base
     * -pub: Proportional upper bound of the protected group
     * -ns: Number of weight vectors
     * -us: Uniform weight vector sampling method
-    * -nt: Number of threads (needed for klevel_based_method and optional for mip_based_method with Gurobi solver)
+    * -nt: Number of threads (optional for klevel_based_method and mip_based_method with Gurobi solver)
     * -uo: Unoptimized (only works for klevel_based_method_2d)
     * -sol: gurobi or scip (default: gurobi)
 
