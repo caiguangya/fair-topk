@@ -272,7 +272,8 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
-    FairTopK::DataLoader::readPreprocessedDataset(fileName, points, groups, protectedGroup);
+    bool success = FairTopK::DataLoader::readPreprocessedDataset(fileName, points, groups, protectedGroup);
+    if (!success) return -1;
 
     if (isGurobi) {
         FairTopK::fairTopkExperiments(points, groups, protectedGroup, params, 

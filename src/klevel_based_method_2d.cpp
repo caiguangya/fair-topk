@@ -279,7 +279,8 @@ int main(int argc, char* argv[]) {
 
     auto [fileName, params] = FairTopK::parseCommandLine(argc, argv);
 
-    FairTopK::DataLoader::readPreprocessedDataset(fileName, points, groups, protectedGroup);
+    bool success = FairTopK::DataLoader::readPreprocessedDataset(fileName, points, groups, protectedGroup);
+    if (!success) return -1;
 
     auto solveFunc = params.unoptimized ? solve<false> : solve<true>;
 

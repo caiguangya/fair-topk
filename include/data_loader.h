@@ -15,7 +15,7 @@ namespace FairTopK {
 
 namespace DataLoader {
 
-void readPreprocessedDataset(const std::string& file, std::vector<Eigen::VectorXd>& points, std::vector<int>& groups, 
+bool readPreprocessedDataset(const std::string& file, std::vector<Eigen::VectorXd>& points, std::vector<int>& groups, 
     int& protectedGroup);
 
 }
