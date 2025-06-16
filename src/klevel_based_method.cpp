@@ -479,20 +479,18 @@ int main(int argc, char* argv[]) {
         std::cerr << "Only support datasets with 3 <= dimensions <= 6" << std::endl;
         return -1;
     }
-    if (params.threadCount <= 0) {
-        std::cerr << "The number of threads must be greater than or equal to 1" << std::endl;
-        return -1;
-    }
+    
+    int threadCount = params.threadCount > 0 ? params.threadCount : std::thread::hardware_concurrency();
 
     constexpr int dimCount = maxDimension - minDimension + 1;
     int dimDiff = dimension - minDimension;
 
-    if (params.threadCount > 1) {
+    if (threadCount > 1) {
         auto solveFunc = boost::mp11::mp_with_index<dimCount>(dimDiff,
             [](auto dimDiff) { return parallelSolve<dimDiff() + minDimension>; });
 
         FairTopK::fairTopkExperiments(points, groups, protectedGroup, params, 
-            [threadCount = params.threadCount, solveFunc]<class... Args>(Args&&... params) { 
+            [threadCount, solveFunc]<class... Args>(Args&&... params) { 
                 return solveFunc(threadCount, std::forward<Args>(params)...);
         });
     }
