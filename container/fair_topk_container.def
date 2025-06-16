@@ -10,12 +10,17 @@ From: ubuntu:24.04
     apt-get install -y vim tar wget unzip
     apt-get install -y git
     apt-get install -y libboost-dev xtensor-dev libgmp-dev libmpfr-dev
+    apt-get install -y m4 xz-utils libgmp-dev unzip zlib1g-dev libboost-program-options-dev libboost-serialization-dev libboost-regex-dev libboost-iostreams-dev libtbb-dev libreadline-dev pkg-config git liblapack-dev libgsl-dev flex bison libcliquer-dev gfortran file dpkg-dev libopenblas-dev rpm libmetis-dev
+
     unset DEBIAN_FRONTEND
 
     wget -v https://packages.gurobi.com/11.0/gurobi11.0.3_linux64.tar.gz
     git clone --single-branch -b 3.4.0 https://gitlab.com/libeigen/eigen.git eigen
     git clone https://github.com/khizmax/libcds.git libcds
     git clone --single-branch -b v2.5.0 https://github.com/CLIUtils/CLI11.git CLI11
+    git clone --single-branch -b v922 https://github.com/scipopt/scip.git scip
+    git clone --single-branch -b release-714 https://github.com/scipopt/soplex.git soplex
+    git clone --single-branch -b v2.4.2 https://github.com/scipopt/papilo.git papilo
 
     tar -xvf gurobi11.0.3_linux64.tar.gz
     rm -f gurobi11.0.3_linux64.tar.gz
@@ -51,6 +56,30 @@ From: ubuntu:24.04
     make install -j
     cd ../
     rm -rf CLI11
+
+    cd papilo
+    mkdir build
+    cd build
+    cmake -DCMAKE_BUILD_TYPE=Release ..
+    make install -j
+    cd ../../
+    rm -rf papilo
+
+    cd soplex
+    mkdir build
+    cd build
+    cmake -DCMAKE_BUILD_TYPE=Release ..
+    make install -j
+    cd ../../
+    rm -rf soplex
+
+    cd scip
+    mkdir build
+    cd build
+    cmake -DCMAKE_BUILD_TYPE=Release -DZIMPL=off -DIPOPT=off ..
+    make install -j
+    cd ../../
+    rm -rf scip
 
 %environment
     export LC_ALL=C

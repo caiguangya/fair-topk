@@ -8,6 +8,7 @@
 #include <limits>
 #include <iostream>
 
+#include <boost/algorithm/string/case_conv.hpp>
 #include "CLI/CLI.hpp"
 
 namespace FairTopK {
@@ -149,6 +150,7 @@ std::pair<std::string, InputParams> parseCommandLine(int argc, char* argv[]) {
     app.add_option("-pub", pGroupUpperBoundRatio, "Protected Group upper bound");
     app.add_option("-nt", inputParams.threadCount, "Number of threads");
     app.add_option("-ns", inputParams.sampleCount, "Number of samples");
+    app.add_option("-sol", inputParams.solver, "MILP Solver");
 
     app.add_flag("-t", inputParams.runtime, "Runtime");
     app.add_flag("-q", inputParams.quality, "Evaluate Quality");
@@ -156,6 +158,8 @@ std::pair<std::string, InputParams> parseCommandLine(int argc, char* argv[]) {
     app.add_flag("-uo", inputParams.unoptimized, "Unoptimized");
 
     app.parse(argc, argv);
+
+    boost::algorithm::to_lower(inputParams.solver);
 
     inputParams.pGroupLowerBound = (int)std::floor(pGroupLowerBoundRatio * inputParams.k);
     inputParams.pGroupUpperBound = (int)std::ceil(pGroupUpperBoundRatio * inputParams.k);
