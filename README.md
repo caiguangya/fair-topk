@@ -1,14 +1,15 @@
 # Finding a Fair Scoring Function for Top-k Selection: From Hardness to Practice
 
 ## Overview
-This repository host codes for *Finding a Fair Scoring Function for Top-k Selection: From Hardness to Practice* (in submission, [full version](https://arxiv.org/abs/2503.11575) available).
+This repository hosts codes for *Finding a Fair Scoring Function for Top-k Selection: From Hardness to Practice* (in submission, [full version](https://arxiv.org/abs/2503.11575) available).
 
 The `main` branch is all you need for reproducing experimental results and the `preprocessing` branch contains codes for data preprocessing.
 
 ## Build
+### Containerization (recommended)
 This project can be built using either Apptainer or Docker containerization. 
 
-### Apptainer
+#### Apptainer
 1. [Install Apptainer](https://apptainer.org/docs/admin/main/installation.html) (see [this](https://github.com/apptainer/apptainer/blob/main/INSTALL.md#apparmor-profile-ubuntu-2310) for installation on Ubuntu 23.10+)
 2. Build Apptainer image
    ```
@@ -22,7 +23,7 @@ This project can be built using either Apptainer or Docker containerization.
    ```
    cmake . && make -j
    ```
-### Docker
+#### Docker
 1. [Install Docker](https://docs.docker.com/engine/install)
 2. Pull Docker image
    ```
@@ -36,13 +37,30 @@ This project can be built using either Apptainer or Docker containerization.
    ```
    cmake . && make -j
    ```
-
+### Local
+1. Install dependencies
+   - g++ (>= 13.3), [CMake](https://cmake.org/) (>= 3.12)
+   - [Eigen](https://eigen.tuxfamily.org/index.php?title=Main_Page) (>= 3.4)
+   - [Gurobi](https://support.gurobi.com/hc/en-us/articles/4534161999889-How-do-I-install-Gurobi-Optimizer) (>= 11.0.3)
+   - [SCIP](https://github.com/scipopt/scip) (>= 9.2.2), [PaPILO](https://github.com/scipopt/papilo) (>= 2.4.2), [SoPlex](https://github.com/scipopt/soplex) (>= 7.1.4)
+   - [CLI11](https://github.com/CLIUtils/CLI11) (>= 2.5.0)
+   - [libcds](https://github.com/khizmax/libcds)
+   - [Boost](https://www.boost.org/)
+   - [xtensor](https://github.com/xtensor-stack/xtensor)
+  
+   See ```container/fair_topk_container.def``` for installation commands on Debian or Ubuntu systems.
+  
+2. Compilation
+   ```
+   cmake . && make -j
+   ```
+   
 Output programs: **klevel_based_method**, **klevel_based_method_2d**, **mip_based_method**, **baseline** and **baseline_2d**
 
 ## Reproducibility
 1. [Download preprocessed datasets](https://www.dropbox.com/scl/fo/of387p4m1lpgh05q2x75j/AJy3Sn5r97WBRI3Vi4VRb_A?rlkey=hvqpbr6qv3xe0gl5h7teez2tk&st=f6se30uq&dl=0)
-2. Launch the container
-3. Run programs inside the container
+2. Launch the container (skip this step if locally built)
+3. Run programs (inside the container)
     ```
     program [-t] [-q] [-f <PREPROCESSED DATASET PATH>] [-k k_value] \
         [-plb lower_bound] [-pub upper_bound] [-eps epsilon] \ 
