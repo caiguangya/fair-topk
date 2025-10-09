@@ -80,7 +80,7 @@ bool solveGurobi(int threadCount, const std::vector<Eigen::VectorXd> &points,
     //sum_{i=1}^{d} w_i = 1
     {
         GRBLinExpr expr = 0;
-        expr.addTerms(&ones[0], &scoreVars[0], dimension);
+        expr.addTerms(ones.data(), scoreVars.data(), dimension);
         model.addConstr(expr == 1.0);
     }
 
@@ -88,7 +88,7 @@ bool solveGurobi(int threadCount, const std::vector<Eigen::VectorXd> &points,
     for (int i = 0; i < count; i++) {
         GRBLinExpr expr = 0;  
 
-        expr.addTerms(points[i].data(), &scoreVars[0], dimension);
+        expr.addTerms(points[i].data(), scoreVars.data(), dimension);
         expr -= scoreVars[dimension];
         expr -= indicatorVars[i];
 
@@ -97,13 +97,13 @@ bool solveGurobi(int threadCount, const std::vector<Eigen::VectorXd> &points,
 
     {
         GRBLinExpr expr = 0;
-        expr.addTerms(&ones[0], &pGroupIndVars[0], pGroupIndVars.size());
+        expr.addTerms(ones.data(), pGroupIndVars.data(), pGroupIndVars.size());
         model.addRange(expr, pGroupLowerBound, pGroupUpperBound);
     }
 
     {
         GRBLinExpr expr = 0;
-        expr.addTerms(&ones[0], &indicatorVars[0], count);
+        expr.addTerms(ones.data(), indicatorVars.data(), count);
         model.addConstr(expr == k);
     }
 

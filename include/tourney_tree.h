@@ -241,7 +241,7 @@ KineticTourneyLineTree<Line, Opt, Compare, CrossCompute>::KineticTourneyLineTree
 template <class Line, bool Opt, class Compare, class CrossCompute> requires LegitTourneyLineTree<Compare, CrossCompute, Line>
 KineticTourneyLineTree<Line, Opt, Compare, CrossCompute>::~KineticTourneyLineTree() {
     if constexpr (Opt) FairTopK::freeAligned(root);
-    else recursiveDestory(root);
+    else Detail::recursiveDestory(root);
 }
 
 template <class Line, bool Opt, class Compare, class CrossCompute> requires LegitTourneyLineTree<Compare, CrossCompute, Line>
