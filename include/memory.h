@@ -43,7 +43,9 @@ inline void *allocAligned(std::size_t size) {
 #if BOOST_OS_WINDOWS
         return _aligned_malloc(size, Align);
 #else
-        return std::aligned_alloc(Align, size);
+        constexpr std::size_t complement = Align - 1;
+        std::size_t allocatedSize = ((size + complement) & (~complement));
+        return std::aligned_alloc(Align, allocatedSize);
 #endif
 	}
 	else {
