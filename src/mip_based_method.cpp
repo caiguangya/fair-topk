@@ -183,7 +183,7 @@ bool solveSCIP([[maybe_unused]] int threadCount, const std::vector<Eigen::Vector
 
     {
         SCIP_CONS *cons = nullptr;
-        SCIP_CALL(SCIPcreateConsBasicLinear(scip, &cons, "", dimension, &scoreVars[0], &ones[0], 1.0, 1.0));
+        SCIP_CALL(SCIPcreateConsBasicLinear(scip, &cons, "", dimension, scoreVars.data(), ones.data(), 1.0, 1.0));
         SCIP_CALL(SCIPaddCons(scip, cons));
 
         constraints.push_back(cons);
@@ -200,7 +200,7 @@ bool solveSCIP([[maybe_unused]] int threadCount, const std::vector<Eigen::Vector
             consVals.head(dimension) = points[i];
 
             SCIP_CONS *cons = nullptr;
-            SCIP_CALL(SCIPcreateConsBasicLinear(scip, &cons, "", dimension + 2, &consVars[0], consVals.data(), 
+            SCIP_CALL(SCIPcreateConsBasicLinear(scip, &cons, "", dimension + 2, consVars.data(), consVals.data(), 
                 -1.0, 0.0));
             SCIP_CALL(SCIPaddCons(scip, cons));
 
@@ -210,7 +210,7 @@ bool solveSCIP([[maybe_unused]] int threadCount, const std::vector<Eigen::Vector
 
     {
         SCIP_CONS *cons = nullptr;
-        SCIP_CALL(SCIPcreateConsBasicLinear(scip, &cons, "", pGroupIndVars.size(), &pGroupIndVars[0], &ones[0], 
+        SCIP_CALL(SCIPcreateConsBasicLinear(scip, &cons, "", pGroupIndVars.size(), pGroupIndVars.data(), ones.data(), 
             (SCIP_Real)pGroupLowerBound, (SCIP_Real)pGroupUpperBound));
         SCIP_CALL(SCIPaddCons(scip, cons));
 
@@ -219,7 +219,7 @@ bool solveSCIP([[maybe_unused]] int threadCount, const std::vector<Eigen::Vector
 
     {
         SCIP_CONS *cons = nullptr;
-        SCIP_CALL(SCIPcreateConsBasicLinear(scip, &cons, "", count, &indicatorVars[0], &ones[0], 
+        SCIP_CALL(SCIPcreateConsBasicLinear(scip, &cons, "", count, indicatorVars.data(), ones.data(), 
             (SCIP_Real)k, (SCIP_Real)k));
         SCIP_CALL(SCIPaddCons(scip, cons));
 
@@ -245,6 +245,7 @@ bool solveSCIP([[maybe_unused]] int threadCount, const std::vector<Eigen::Vector
         SCIP_CALL(SCIPreleaseVar(scip, &var));
     }
     indicatorVars.clear();
+    pGroupIndVars.clear();
 
     for (auto cons: constraints) {
         SCIP_CALL(SCIPreleaseCons(scip, &cons));
