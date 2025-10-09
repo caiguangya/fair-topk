@@ -1,7 +1,7 @@
 # Finding a Fair Scoring Function for Top-k Selection: From Hardness to Practice
 
 ## Overview
-This repository hosts codes for *Finding a Fair Scoring Function for Top-k Selection: From Hardness to Practice* (in submission, [full version](https://arxiv.org/abs/2503.11575) available).
+This repository hosts codes for *Finding a Fair Scoring Function for Top-k Selection: From Hardness to Practice* ([arXiv](https://arxiv.org/abs/2503.11575)).
 
 The `main` branch is all you need for reproducing experimental results and the `preprocessing` branch contains codes for data preprocessing.
 
