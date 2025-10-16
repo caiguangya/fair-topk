@@ -281,6 +281,12 @@ int main(int argc, char* argv[]) {
     bool success = FairTopK::DataLoader::readPreprocessedDataset(fileName, points, groups, protectedGroup);
     if (!success) return -1;
 
+    int dimension = points[0].rows();
+    if (dimension != 2) {
+        std::cerr << "Do not support datasets with dimensions != 2" << std::endl;
+        return -1;
+    }
+
     auto solveFunc = params.unoptimized ? solve<false> : solve<true>;
 
     FairTopK::fairTopkExperiments(points, groups, protectedGroup, params, solveFunc);
