@@ -8,10 +8,10 @@
 #define FAIR_TOPK_BSPTREE_H
 
 #include <stack>
-#include <iterator>
 #include <concepts>
 #include <algorithm>
 #include <cstddef>
+#include <utility>
 
 #include <Eigen/Dense>
 #include <sdlp/sdlp.hpp>

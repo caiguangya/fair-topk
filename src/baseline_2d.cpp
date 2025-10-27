@@ -341,7 +341,8 @@ int main(int argc, char* argv[]) {
 
     auto [fileName, params] = FairTopK::parseCommandLine(argc, argv);
 
-    FairTopK::DataLoader::readPreprocessedDataset(fileName, points, groups, protectedGroup);
+    bool success = FairTopK::DataLoader::readPreprocessedDataset(fileName, points, groups, protectedGroup);
+    if (!success) return -1;
 
     int dimension = points[0].rows();
     if (dimension != 2) {

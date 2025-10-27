@@ -8,6 +8,8 @@
 #include <limits>
 #include <iostream>
 
+#include <boost/multiprecision/cpp_dec_float.hpp>
+#include <boost/algorithm/string/case_conv.hpp>
 #include "CLI/CLI.hpp"
 
 namespace FairTopK {
@@ -118,7 +120,10 @@ const std::vector<int>& groups, int k, int pGroup, int pGroupLowerBound, int pGr
 
 namespace {
 
-void printInputInfos(int k, double pGroupLowerBound, double pGroupUpperBound, double margin, int threadCount) {
+void printInputInfos(int k, 
+    boost::multiprecision::cpp_dec_float_50 pGroupLowerBound, 
+    boost::multiprecision::cpp_dec_float_50 pGroupUpperBound,
+    double margin, int threadCount) {
     std::cout << "k: " << k << 
                  " | Protected Group Proportion Lower Bound: " << pGroupLowerBound <<
                  " | Protected Group Proportion Upper Bound: " << pGroupUpperBound <<
@@ -137,18 +142,19 @@ std::pair<std::string, InputParams> parseCommandLine(int argc, char* argv[]) {
     std::string file;
     InputParams inputParams;
 
-    double pGroupLowerBoundRatio = 0.0;
-    double pGroupUpperBoundRatio = 0.0;
+    std::string pGroupLowerBoundRatioStr;
+    std::string pGroupUpperBoundRatioStr;
 
     app.allow_non_standard_option_names();
 
     app.add_option("-f", file, "File");
     app.add_option("-k", inputParams.k, "k");
     app.add_option("-eps", inputParams.margin, "Epsilon");
-    app.add_option("-plb", pGroupLowerBoundRatio, "Protected Group lower bound");
-    app.add_option("-pub", pGroupUpperBoundRatio, "Protected Group upper bound");
+    app.add_option("-plb", pGroupLowerBoundRatioStr, "Protected Group lower bound");
+    app.add_option("-pub", pGroupUpperBoundRatioStr, "Protected Group upper bound");
     app.add_option("-nt", inputParams.threadCount, "Number of threads");
     app.add_option("-ns", inputParams.sampleCount, "Number of samples");
+    app.add_option("-sol", inputParams.solver, "MILP Solver");
 
     app.add_flag("-t", inputParams.runtime, "Runtime");
     app.add_flag("-q", inputParams.quality, "Evaluate Quality");
@@ -157,8 +163,14 @@ std::pair<std::string, InputParams> parseCommandLine(int argc, char* argv[]) {
 
     app.parse(argc, argv);
 
-    inputParams.pGroupLowerBound = (int)std::floor(pGroupLowerBoundRatio * inputParams.k);
-    inputParams.pGroupUpperBound = (int)std::ceil(pGroupUpperBoundRatio * inputParams.k);
+    boost::algorithm::to_lower(inputParams.solver);
+
+    using cpp_dec_float_50 = boost::multiprecision::cpp_dec_float_50;
+    cpp_dec_float_50 pGroupLowerBoundRatio(pGroupLowerBoundRatioStr);
+    cpp_dec_float_50 pGroupUpperBoundRatio(pGroupUpperBoundRatioStr);
+
+    inputParams.pGroupLowerBound = (int)std::floor((pGroupLowerBoundRatio * inputParams.k).convert_to<double>());
+    inputParams.pGroupUpperBound = (int)std::ceil((pGroupUpperBoundRatio * inputParams.k).convert_to<double>());
 
     printInputInfos(inputParams.k, pGroupLowerBoundRatio, pGroupUpperBoundRatio, inputParams.margin, inputParams.threadCount);
 

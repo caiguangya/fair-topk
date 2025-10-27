@@ -3,7 +3,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
- 
+
 #ifndef FAIR_TOPK_MEMORY_H
 #define FAIR_TOPK_MEMORY_H
 
@@ -34,13 +34,18 @@ namespace FairTopK {
 template <std::size_t Align, class T>
 concept LegitAlignment = (std::has_single_bit(Align)) && (Align >= alignof(T));
 
+template <class T>
+concept TriviallyDestructible = std::is_trivially_destructible_v<T>;
+
 template<std::size_t Align> requires (std::has_single_bit(Align))
 inline void *allocAligned(std::size_t size) {
 	if constexpr (Align > alignof(std::max_align_t)) {
 #if BOOST_OS_WINDOWS
         return _aligned_malloc(size, Align);
 #else
-        return std::aligned_alloc(Align, size);
+        constexpr std::size_t complement = Align - 1;
+        std::size_t allocatedSize = ((size + complement) & (~complement));
+        return std::aligned_alloc(Align, allocatedSize);
 #endif
 	}
 	else {
@@ -77,7 +82,7 @@ inline void Initiation(T *vals, std::size_t size) {
 	memset(vals, 0, sizeof(T) * size);
 }
 
-template <class T, std::size_t BlockAlign = CacheLineAlign, std::size_t ObjAlign = alignof(T)> requires
+template <TriviallyDestructible T, std::size_t BlockAlign = CacheLineAlign, std::size_t ObjAlign = alignof(T)> requires
 LegitAlignment<BlockAlign, T> && LegitAlignment<ObjAlign, T> && (BlockAlign >= ObjAlign)
 class MemoryArena {
 public:
@@ -125,14 +130,7 @@ template<class T, class... Args> inline void Construct(T* p, Args&&... inits){
 	new (p) T(std::forward<Args>(inits)...);
 }
 
-template<class T> requires std::is_trivially_destructible_v<T>
-inline void Destory(T* p) {}
-
-template<class T> inline void Destory(T* p) {
-	p->~T();
-}
-
-template <class T, std::size_t Align = std::max({alignof(T), alignof(std::int8_t *), sizeof(std::int8_t *)})> requires
+template <TriviallyDestructible T, std::size_t Align = std::max({alignof(T), alignof(std::int8_t *), sizeof(std::int8_t *)})> requires
 LegitAlignment<Align, T> && (Align >= std::max(alignof(std::int8_t *), sizeof(std::int8_t *))) && (Align <= CacheLineAlign)
 class MemoryPool {
 public:
@@ -171,7 +169,6 @@ public:
 	}
 
 	void Dealloc(T *item) {
-		Destory(item);
 		*(int8_t **)item = deadStack;
 		deadStack = (int8_t *)item;
 	}
