@@ -9,6 +9,8 @@
 
 #include <vector>
 #include <random>
+#include <string>
+#include <utility>
 
 #include <Eigen/Dense>
 
@@ -41,6 +43,7 @@ struct InputParams {
     bool runtime = false;
     bool quality = false;
     bool unoptimized = false;
+    std::string solver = "gurobi";
 };
 
 std::pair<std::string, InputParams> parseCommandLine(int argc, char* argv[]);

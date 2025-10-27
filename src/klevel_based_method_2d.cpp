@@ -21,7 +21,7 @@ struct GroupedLine {
 };
 
 bool isFair(const std::vector<GroupedLine>& lines, int k, double time, int pGroup,
-int pGroupLowerBound, int pGroupUpperBound, double epsilon) {
+    int pGroupLowerBound, int pGroupUpperBound, double epsilon) {
     const GroupedLine& kthLine = lines[k - 1];
     double kthScore = kthLine.k * time + kthLine.b;
 
@@ -33,7 +33,7 @@ int pGroupLowerBound, int pGroupUpperBound, double epsilon) {
     for (int i = 0; i < k - 1; i++) {
         const GroupedLine& line = lines[i];
         double score = line.k * time + line.b;
-        double group = line.group;
+        int group = line.group;
 
         int isProtected = (group == pGroup);
         if (score - kthScore > epsilon) {
@@ -50,7 +50,7 @@ int pGroupLowerBound, int pGroupUpperBound, double epsilon) {
     for (int i = k; i < count; i++) {
         const GroupedLine& line = lines[i];
         double score = line.k * time + line.b;
-        double group = line.group;
+        int group = line.group;
 
         if (kthScore - score <= epsilon) {
             int isProtected = (group == pGroup);
@@ -66,8 +66,8 @@ int pGroupLowerBound, int pGroupUpperBound, double epsilon) {
 }
 
 template <bool Opt = true>
-bool solve(const std::vector<Eigen::VectorXd> &points, const std::vector<int>& groups, int k, int pGroup, int pGroupLowerBound, 
-int pGroupUpperBound, double margin, Eigen::VectorXd& weights) {
+bool solve(const std::vector<Eigen::VectorXd> &points, const std::vector<int>& groups, int k, int pGroup, 
+    int pGroupLowerBound, int pGroupUpperBound, double margin, Eigen::VectorXd& weights) {
     double timeLower = std::max({ 0.0, weights(0) - margin, 1.0 - weights(1) - margin });
     double timeUpper = std::min({ 1.0, weights(0) + margin, 1.0 - weights(1) + margin });
 
@@ -91,6 +91,13 @@ int pGroupUpperBound, double margin, Eigen::VectorXd& weights) {
             return std::abs(diff) > epsilon ? (diff > 0.0) : 
                 (l1.k != l2.k ? l1.k > l2.k : l1.b > l2.b);
     });
+
+    if (isFair(lines, k, timeLower, pGroup, pGroupLowerBound, pGroupUpperBound, epsilon)) {
+        weights(0) = timeLower; 
+        weights(1) = 1.0 - timeLower;
+        
+        return true;
+    }
 
     auto less = [](const GroupedLine& left, const GroupedLine& right, double time) noexcept {
         double score1 = left.k * time + left.b;
@@ -116,23 +123,15 @@ int pGroupUpperBound, double margin, Eigen::VectorXd& weights) {
         return (right.b - left.b) / (left.k - right.k);
     };
 
-    if (isFair(lines, k, timeLower, pGroup, pGroupLowerBound, pGroupUpperBound, epsilon)) {
-        weights(0) = timeLower; 
-        weights(1) = 1.0 - weights(0);
-        
-        return true;
-    }
-
-    int pGroupCount = 0;
-    for (int i = 0; i < k; i++) {
-        pGroupCount += (lines[i].group == pGroup);
-    }
-
     using TopKTreeType = FairTopK::KineticTourneyLineTree<GroupedLine, Opt, decltype(less), decltype(crossCompute)>;
     using OtherTreeType = FairTopK::KineticTourneyLineTree<GroupedLine, Opt, decltype(greater), decltype(crossCompute)>;
 
-    TopKTreeType topKTree(lines.begin(), lines.begin() + k, timeLower, timeUpper, less, crossCompute);
-    OtherTreeType otherTree(lines.begin() + k, lines.end(), timeLower, timeUpper, greater, crossCompute);
+    TopKTreeType topKTree(lines.cbegin(), lines.cbegin() + k, timeLower, timeUpper, less, crossCompute);
+    OtherTreeType otherTree(lines.cbegin() + k, lines.cend(), timeLower, timeUpper, greater, crossCompute);
+
+    int pGroupCount = 0;
+    for (int i = 0; i < k; i++)
+        pGroupCount += (lines[i].group == pGroup);
 
     enum class AdvanceType { Exchange, TopK, Other };
 
@@ -279,7 +278,14 @@ int main(int argc, char* argv[]) {
 
     auto [fileName, params] = FairTopK::parseCommandLine(argc, argv);
 
-    FairTopK::DataLoader::readPreprocessedDataset(fileName, points, groups, protectedGroup);
+    bool success = FairTopK::DataLoader::readPreprocessedDataset(fileName, points, groups, protectedGroup);
+    if (!success) return -1;
+
+    int dimension = points[0].rows();
+    if (dimension != 2) {
+        std::cerr << "Do not support datasets with dimensions != 2" << std::endl;
+        return -1;
+    }
 
     auto solveFunc = params.unoptimized ? solve<false> : solve<true>;
 

@@ -7,6 +7,7 @@
 #include <iostream>
 #include <algorithm>
 #include <random>
+#include <utility>
 #include <boost/mp11/algorithm.hpp>
 
 #include <Eigen/Dense>
@@ -263,7 +264,8 @@ int main(int argc, char* argv[]) {
 
     auto [fileName, params] = FairTopK::parseCommandLine(argc, argv);
 
-    FairTopK::DataLoader::readPreprocessedDataset(fileName, points, groups, protectedGroup);
+    bool success = FairTopK::DataLoader::readPreprocessedDataset(fileName, points, groups, protectedGroup);
+    if (!success) return -1;
 
     int dimension = points[0].rows();
     constexpr int minDimension = 3;
