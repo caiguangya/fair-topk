@@ -1,9 +1,9 @@
 # Finding a Fair Scoring Function for Top-k Selection: From Hardness to Practice
 
 ## Overview
-This repository hosts codes for *Finding a Fair Scoring Function for Top-k Selection: From Hardness to Practice* ([arXiv](https://arxiv.org/abs/2503.11575)).
+This repository hosts codes for *Finding a Fair Scoring Function for Top-k Selection: From Hardness to Practice*.
 
-The `main` branch is all you need for reproducing experimental results and the `preprocessing` branch contains codes for data preprocessing.
+The `main` branch is all you need for reproducing experimental results and the [`preprocessing`](https://anonymous.4open.science/r/fair-topk-anonymous-preprocessing) branch contains codes for data preprocessing.
 
 ## Build
 ### Containerization (recommended)
@@ -27,11 +27,11 @@ This project can be built using either Apptainer or Docker containerization.
 1. [Install Docker](https://docs.docker.com/engine/install)
 2. Pull Docker image
    ```
-   docker pull caiguangya/fair-topk:latest
+   docker pull anonymous10010063/fair-topk:latest
    ```
 3. Launch the container
    ```
-   docker run -it -v $(pwd):/fair-topk -w /fair-topk caiguangya/fair-topk:latest
+   docker run -it -v $(pwd):/fair-topk -w /fair-topk anonymous10010063/fair-topk:latest
    ```
 4. Compilation
    ```
@@ -58,7 +58,7 @@ This project can be built using either Apptainer or Docker containerization.
 Output programs: **klevel_based_method**, **klevel_based_method_2d**, **mip_based_method**, **baseline** and **baseline_2d**
 
 ## Reproducibility
-1. [Download preprocessed datasets](https://www.dropbox.com/scl/fo/of387p4m1lpgh05q2x75j/AJy3Sn5r97WBRI3Vi4VRb_A?rlkey=hvqpbr6qv3xe0gl5h7teez2tk&st=f6se30uq&dl=0)
+1. [Download preprocessed datasets](https://www.dropbox.com/scl/fo/gb7x2r54vhjgdqusjv17l/AAizF3D4V4PlzEyDLVEihqs?rlkey=828ylyof8mhwwh0l3efb1zcyi&e=2&st=vekwwsw7&dl=0)
 2. Launch the container (skip this step if locally built)
 3. Run programs (inside the container)
     ```
