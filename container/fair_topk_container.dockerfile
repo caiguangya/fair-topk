@@ -55,7 +55,7 @@ RUN git clone --single-branch -b v2.4.2 https://github.com/scipopt/papilo.git pa
     cmake -DCMAKE_BUILD_TYPE=Release .. && \
     make install -j && \
     cd ../../ && \
-    rm -rf 
+    rm -rf papilo
 
 RUN git clone --single-branch -b release-714 https://github.com/scipopt/soplex.git soplex && \
     cd soplex && \
