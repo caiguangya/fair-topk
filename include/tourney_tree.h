@@ -390,7 +390,7 @@ void KineticTourneyLineTree<Line, Opt, Compare, CrossCompute>::applyToTopEquivs(
     func(topLine);
 
     if (!root->isLeaf()) [[likely]]
-        applyToTopEquivs(topLine, root, std::move(equivCompare), std::move(func));
+        applyToTopEquivs(topLine, root, equivCompare, func);
 }
 
 template <class Line, bool Opt, class Compare, class CrossCompute> requires LegitTourneyLineTree<Compare, CrossCompute, Line>
