@@ -1,9 +1,9 @@
 # Finding a Fair Scoring Function for Top-k Selection: From Hardness to Practice
 
 ## Overview
-This repository hosts codes for *Finding a Fair Scoring Function for Top-k Selection: From Hardness to Practice* ([arXiv](https://arxiv.org/abs/2503.11575)).
+This repository hosts code for *Finding a Fair Scoring Function for Top-k Selection: From Hardness to Practice* ([arXiv](https://arxiv.org/abs/2503.11575)).
 
-The `main` branch is all you need for reproducing experimental results and the `preprocessing` branch contains codes for data preprocessing.
+The `main` branch is all you need for reproducing experimental results and the `preprocessing` branch contains code for data preprocessing.
 
 ## Build
 ### Containerization (recommended)
@@ -40,12 +40,12 @@ This project can be built using either Apptainer or Docker containerization.
 ### Local
 1. Install dependencies
    - g++ (>= 13.3), [CMake](https://cmake.org/) (>= 3.12)
-   - [Eigen](https://eigen.tuxfamily.org/index.php?title=Main_Page) (>= 3.4)
+   - [Eigen](https://libeigen.gitlab.io) (>= 3.4)
    - [Gurobi](https://support.gurobi.com/hc/en-us/articles/4534161999889-How-do-I-install-Gurobi-Optimizer) (>= 11.0.3)
    - [SCIP](https://github.com/scipopt/scip) (>= 9.2.2), [PaPILO](https://github.com/scipopt/papilo) (>= 2.4.2), [SoPlex](https://github.com/scipopt/soplex) (>= 7.1.4)
    - [CLI11](https://github.com/CLIUtils/CLI11) (>= 2.5.0)
    - [libcds](https://github.com/khizmax/libcds)
-   - [Boost](https://www.boost.org/)
+   - [Boost](https://www.boost.org)
    - [xtensor](https://github.com/xtensor-stack/xtensor)
   
    See ```container/fair_topk_container.def``` for installation commands on Debian or Ubuntu systems.
@@ -79,7 +79,7 @@ Output programs: **klevel_based_method**, **klevel_based_method_2d**, **mip_base
 
     See below for examples of commands and their outputs.
 
-For executing mip_based_method with Gurobi solver inside the container, you might need to apply a new [Gurobi license](https://www.gurobi.com/features/web-license-service/). Before executing mip_based_method, run the following command
+For executing mip_based_method with Gurobi solver inside the container, you might need to apply a new [Gurobi license](https://www.gurobi.com/features/web-license-service). Before executing mip_based_method, run the following command
 ```
 export GRB_LICENSE_FILE=\path\to\gurobi\license
 ```
