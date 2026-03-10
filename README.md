@@ -1,5 +1,5 @@
 ## Overview
-This branch contains codes for preprocessing 6-D COMPAS and 3-D IIT-JEE datasets for different $k$ and $n$ values.
+This branch contains code for preprocessing 6-D COMPAS and 3-D IIT-JEE datasets for different $k$ and $n$ values.
 
 ## Build
 Same as the `main` branch.
